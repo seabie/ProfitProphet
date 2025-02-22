@@ -1,0 +1,7 @@
+## Interface: 110002
+## Title: Profit Prophet
+## Notes: Makes you gold
+## Author: seabie
+## Version: 0.1
+
+HelloWorld.lua
