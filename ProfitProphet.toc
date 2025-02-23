@@ -4,4 +4,5 @@
 ## Author: seabie
 ## Version: 0.1
 
-HelloWorld.lua
+ProfitProphet.lua
+AuctionSearch.lua
