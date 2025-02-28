@@ -4,5 +4,6 @@
 ## Author: seabie
 ## Version: 0.1
 
+lib/json.lua
 ProfitProphet.lua
 AuctionSearch.lua

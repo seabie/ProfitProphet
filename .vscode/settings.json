@@ -18,6 +18,7 @@
     "DEFAULT_CHAT_FRAME",
     "DEFAULT",
     "SlashCmdList",
-    "COPPER_PER_GOLD"
+    "COPPER_PER_GOLD",
+    "ITEM_QUALITY_COLORS"
   ]
 }

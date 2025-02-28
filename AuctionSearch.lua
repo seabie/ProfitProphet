@@ -10,7 +10,7 @@ function AuctionSearch:Create()
 
     -- Instance variables
     searcher.searchQueue = {}        -- Queue of {itemID, itemName, quantity}
-    searcher.totalItemCount = 0       -- Total items in the original search request
+    searcher.totalItemCount = 0      -- Total items in the original search request
     searcher.searchResults = {}      -- Results as list of {itemID, itemName, avgPrice}
     searcher.isSearching = false     -- Flag to track if a search is in progress
     searcher.currentSearch = nil     -- Track the current search item
@@ -79,7 +79,7 @@ function AuctionSearch:HandleSearchTimeout(item)
         self.searchTimer = nil
     end
 
-    print("Search for", item.itemName, "(itemID:", item.itemID, ") timed out.")
+    -- print("Search for", item.itemName, "(itemID:", item.itemID, ") timed out.")
     self.retryCount = self.retryCount + 1
     if self.retryCount < self.maxRetries then
         print("Retrying search for", item.itemName, "(itemID:", item.itemID, ") Retry count:", self.retryCount)
@@ -98,9 +98,19 @@ function AuctionSearch:FinishSearches()
         return a.itemID < b.itemID
     end)
 
-    -- Invoke callback with sorted results
+    -- Transform results into JSON-friendly format
+    local jsonResults = {}
+    for _, result in ipairs(self.searchResults) do
+        table.insert(jsonResults, {
+            itemID = result.itemID,
+            itemName = result.itemName,
+            avgPrice = result.avgPrice or nil -- Use nil for no price to match JSON null
+        })
+    end
+
+    -- Invoke callback with JSON-ready results
     if self.callback then
-        self.callback(self.searchResults)
+        self.callback(jsonResults)
     end
 end
 
@@ -120,7 +130,6 @@ function AuctionSearch:CommoditySearchResultsUpdated(itemID)
     -- we will try it again
     -- Note: nil check needed because these callbacks can keep coming after we finish searching (i.e. after the last item)
     if self.currentSearch == nil or itemID ~= self.currentSearch.itemID then
-        print("ItemID does not match current search itemID, ignoring")
         return
     end
 
@@ -155,10 +164,10 @@ function AuctionSearch:CommoditySearchResultsUpdated(itemID)
     end
 
     -- Update progress (total completed / total items)
-    local totalItems = #self.searchQueue + (#self.searchResults - (found and 0 or 1)) -- Adjust for the current item
+    local totalItems = self.totalItemCount
     local completed = #self.searchResults
     local progress = (completed / totalItems) * 100
-    print(string.format("Search for %s (Item %d) complete. Progress: %.2f%%, totalItems: %d, completed: %d", self.currentSearch.itemName, itemID, progress, totalItems, completed))
+    print(string.format("Search for %s (Item %d) complete, average price: %f for %d quantity", self.currentSearch.itemName, itemID, avgPriceInGold, self.currentSearch.quantity))
     if self.progressCallback then
         self.progressCallback(progress)
     end
