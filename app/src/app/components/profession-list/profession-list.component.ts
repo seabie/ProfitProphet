@@ -4,6 +4,20 @@ import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+interface Recipe {
+    id: string;
+    name: string;
+    inputJson: string;
+    materials: { itemId: string; quantity: number; name?: string }[];
+    outputItem: { itemId: string; quantity: number; name?: string };
+}
+
+interface Profession {
+    id: string;
+    name: string;
+    recipes: Recipe[];
+}
+
 @Component({
     selector: 'app-profession-list',
     standalone: true,
@@ -12,13 +26,21 @@ import { CommonModule } from '@angular/common';
         <div class="container">
             <h1>Professions</h1>
             <mat-list>
-                <a
-                    mat-list-item
-                    *ngFor="let profession of professions"
-                    [routerLink]="['/profession', profession.id, 'recipe', '1']"
-                >
-                    {{ profession.name }}
-                </a>
+                <ng-container *ngFor="let profession of professions">
+                    <h3 mat-subheader>{{ profession.name }}</h3>
+                    <a
+                        mat-list-item
+                        *ngFor="let recipe of profession.recipes"
+                        [routerLink]="[
+                            '/profession',
+                            profession.id,
+                            'recipe',
+                            recipe.id,
+                        ]"
+                    >
+                        {{ recipe.name }}
+                    </a>
+                </ng-container>
             </mat-list>
         </div>
     `,
@@ -40,12 +62,93 @@ import { CommonModule } from '@angular/common';
             a.mat-list-item {
                 margin-bottom: 8px;
             }
+            h3.mat-subheader {
+                margin-top: 16px;
+                font-size: 18px;
+            }
         `,
     ],
 })
 export class ProfessionListComponent {
-    professions = [
-        { id: 'enchanting', name: 'Enchanting' },
-        { id: 'tailoring', name: 'Tailoring' },
+    professions: Profession[] = [
+        {
+            id: 'enchanting',
+            name: 'Enchanting',
+            recipes: [
+                {
+                    id: '1',
+                    name: 'Enchant Weapon - Power',
+                    inputJson: '{"itemId": "123", "quantity": 1}',
+                    materials: [
+                        { itemId: '123', quantity: 1, name: 'Arcane Dust' },
+                        {
+                            itemId: '124',
+                            quantity: 2,
+                            name: 'Greater Planar Essence',
+                        },
+                    ],
+                    outputItem: {
+                        itemId: '125',
+                        quantity: 1,
+                        name: 'Enchant Weapon - Power',
+                    },
+                },
+                {
+                    id: '2',
+                    name: 'Enchant Bracer - Stamina',
+                    inputJson: '{"itemId": "126", "quantity": 1}',
+                    materials: [
+                        { itemId: '123', quantity: 3, name: 'Arcane Dust' },
+                    ],
+                    outputItem: {
+                        itemId: '126',
+                        quantity: 1,
+                        name: 'Enchant Bracer - Stamina',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'tailoring',
+            name: 'Tailoring',
+            recipes: [
+                {
+                    id: '1',
+                    name: 'Frostweave Bag',
+                    inputJson: '{"itemId": "456", "quantity": 2}',
+                    materials: [
+                        {
+                            itemId: '456',
+                            quantity: 4,
+                            name: 'Frostweave Cloth',
+                        },
+                        { itemId: '457', quantity: 1, name: 'Eternium Thread' },
+                    ],
+                    outputItem: {
+                        itemId: '458',
+                        quantity: 1,
+                        name: 'Frostweave Bag',
+                    },
+                },
+                {
+                    id: '2',
+                    name: 'Netherweave Bag',
+                    inputJson: '{"itemId": "459", "quantity": 2}',
+                    materials: [
+                        {
+                            itemId: '460',
+                            quantity: 4,
+                            name: 'Netherweave Cloth',
+                        },
+                        { itemId: '457', quantity: 1, name: 'Eternium Thread' },
+                    ],
+                    outputItem: {
+                        itemId: '459',
+                        quantity: 1,
+                        name: 'Netherweave Bag',
+                    },
+                },
+            ],
+        },
     ];
 }

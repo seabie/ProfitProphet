@@ -16,13 +16,14 @@ interface Recipe {
     name: string;
     professionId: string;
     inputJson: string;
-    materials: { itemId: string; quantity: number }[];
-    outputItem: { itemId: string; quantity: number };
+    materials: { itemId: string; quantity: number; name?: string }[];
+    outputItem: { itemId: string; quantity: number; name?: string };
 }
 
 interface AuctionData {
     itemId: string;
     price: number;
+    name?: string;
 }
 
 @Component({
@@ -66,11 +67,11 @@ interface AuctionData {
 
                     <div class="form-group">
                         <mat-form-field appearance="fill">
-                            <mat-label>Auction Data</mat-label>
+                            <mat-label>Auction Data (JSON)</mat-label>
                             <textarea
                                 matInput
                                 [(ngModel)]="auctionJson"
-                                placeholder="Paste JSON here"
+                                placeholder='Example: [{"itemId": "123", "price": 100}, {"itemId": "124", "price": 50}]'
                             ></textarea>
                         </mat-form-field>
                         <button mat-button (click)="calculateProfit()">
@@ -91,7 +92,7 @@ interface AuctionData {
                             </ng-container>
                             <ng-container matColumnDef="cost">
                                 <mat-header-cell *matHeaderCellDef
-                                    >Cost</mat-header-cell
+                                    >Cost/Value</mat-header-cell
                                 >
                                 <mat-cell *matCellDef="let row">{{
                                     row.cost
@@ -157,31 +158,6 @@ export class RecipeDetailComponent implements OnInit {
     auctionJson = '';
     profitData: { item: string; cost: number }[] = [];
 
-    private recipes: Recipe[] = [
-        {
-            id: '1',
-            name: 'Enchant Weapon - Power',
-            professionId: 'enchanting',
-            inputJson: '{"itemId": "123", "quantity": 1}',
-            materials: [
-                { itemId: '123', quantity: 1 },
-                { itemId: '124', quantity: 2 },
-            ],
-            outputItem: { itemId: '125', quantity: 1 },
-        },
-        {
-            id: '1',
-            name: 'Frostweave Bag',
-            professionId: 'tailoring',
-            inputJson: '{"itemId": "456", "quantity": 2}',
-            materials: [
-                { itemId: '456', quantity: 4 },
-                { itemId: '457', quantity: 1 },
-            ],
-            outputItem: { itemId: '458', quantity: 1 },
-        },
-    ];
-
     constructor(
         private route: ActivatedRoute,
         private snackBar: MatSnackBar,
@@ -190,11 +166,118 @@ export class RecipeDetailComponent implements OnInit {
     ngOnInit() {
         const professionId = this.route.snapshot.paramMap.get('id');
         const recipeId = this.route.snapshot.paramMap.get('recipeId');
-        const foundRecipe = this.recipes.find(
-            (r) => r.professionId === professionId && r.id === recipeId,
-        );
-        if (foundRecipe) {
-            this.recipe = foundRecipe;
+
+        // In a real app, fetch recipes from a service; for now, use a static list
+        const professions = [
+            {
+                id: 'enchanting',
+                name: 'Enchanting',
+                recipes: [
+                    {
+                        id: '1',
+                        name: 'Enchant Weapon - Power',
+                        professionId: 'enchanting',
+                        inputJson: '{"itemId": "123", "quantity": 1}',
+                        materials: [
+                            { itemId: '123', quantity: 1, name: 'Arcane Dust' },
+                            {
+                                itemId: '124',
+                                quantity: 2,
+                                name: 'Greater Planar Essence',
+                            },
+                        ],
+                        outputItem: {
+                            itemId: '125',
+                            quantity: 1,
+                            name: 'Enchant Weapon - Power',
+                        },
+                    },
+                    {
+                        id: '2',
+                        name: 'Enchant Bracer - Stamina',
+                        professionId: 'enchanting',
+                        inputJson: '{"itemId": "126", "quantity": 1}',
+                        materials: [
+                            { itemId: '123', quantity: 3, name: 'Arcane Dust' },
+                        ],
+                        outputItem: {
+                            itemId: '126',
+                            quantity: 1,
+                            name: 'Enchant Bracer - Stamina',
+                        },
+                    },
+                ],
+            },
+            {
+                id: 'tailoring',
+                name: 'Tailoring',
+                recipes: [
+                    {
+                        id: '1',
+                        name: 'Frostweave Bag',
+                        professionId: 'tailoring',
+                        inputJson: '{"itemId": "456", "quantity": 2}',
+                        materials: [
+                            {
+                                itemId: '456',
+                                quantity: 4,
+                                name: 'Frostweave Cloth',
+                            },
+                            {
+                                itemId: '457',
+                                quantity: 1,
+                                name: 'Eternium Thread',
+                            },
+                        ],
+                        outputItem: {
+                            itemId: '458',
+                            quantity: 1,
+                            name: 'Frostweave Bag',
+                        },
+                    },
+                    {
+                        id: '2',
+                        name: 'Netherweave Bag',
+                        professionId: 'tailoring',
+                        inputJson: '{"itemId": "459", "quantity": 2}',
+                        materials: [
+                            {
+                                itemId: '460',
+                                quantity: 4,
+                                name: 'Netherweave Cloth',
+                            },
+                            {
+                                itemId: '457',
+                                quantity: 1,
+                                name: 'Eternium Thread',
+                            },
+                        ],
+                        outputItem: {
+                            itemId: '459',
+                            quantity: 1,
+                            name: 'Netherweave Bag',
+                        },
+                    },
+                ],
+            },
+        ];
+
+        const profession = professions.find((p) => p.id === professionId);
+        if (profession) {
+            const foundRecipe = profession.recipes.find(
+                (r) => r.id === recipeId,
+            );
+            if (foundRecipe) {
+                this.recipe = foundRecipe;
+            } else {
+                this.snackBar.open('Recipe not found.', 'Dismiss', {
+                    duration: 3000,
+                });
+            }
+        } else {
+            this.snackBar.open('Profession not found.', 'Dismiss', {
+                duration: 3000,
+            });
         }
     }
 
@@ -210,34 +293,75 @@ export class RecipeDetailComponent implements OnInit {
 
         try {
             const auctionData: AuctionData[] = JSON.parse(this.auctionJson);
+            if (!Array.isArray(auctionData) || auctionData.length === 0) {
+                throw new Error('Auction data must be a non-empty array.');
+            }
+
+            const invalidEntry = auctionData.find(
+                (entry) =>
+                    !entry.itemId ||
+                    typeof entry.price !== 'number' ||
+                    entry.price < 0,
+            );
+            if (invalidEntry) {
+                throw new Error(
+                    'Auction data contains invalid entries. Each entry must have an itemId and a non-negative price.',
+                );
+            }
+
             let totalCost = 0;
             const materialCosts = this.recipe.materials.map((material) => {
                 const priceData = auctionData.find(
                     (data) => data.itemId === material.itemId,
                 );
-                const cost = (priceData?.price || 0) * material.quantity;
+                if (!priceData) {
+                    throw new Error(
+                        `Price data not found for item ${material.name || material.itemId}.`,
+                    );
+                }
+                const cost = priceData.price * material.quantity;
                 totalCost += cost;
-                return { item: `Material ${material.itemId}`, cost };
+                return {
+                    item: `${material.name || material.itemId} (x${material.quantity})`,
+                    cost,
+                };
             });
 
             const revenueData = auctionData.find(
                 (data) => data.itemId === this.recipe.outputItem.itemId,
             );
-            const revenue =
-                (revenueData?.price || 0) * this.recipe.outputItem.quantity;
+            if (!revenueData) {
+                throw new Error(
+                    `Price data not found for output item ${this.recipe.outputItem.name || this.recipe.outputItem.itemId}.`,
+                );
+            }
+            const revenue = revenueData.price * this.recipe.outputItem.quantity;
             const profit = revenue - totalCost;
 
             this.profitData = [
                 ...materialCosts,
                 { item: 'Total Cost', cost: totalCost },
-                { item: 'Revenue', cost: revenue },
+                {
+                    item: `Revenue (${this.recipe.outputItem.name || this.recipe.outputItem.itemId} x${this.recipe.outputItem.quantity})`,
+                    cost: revenue,
+                },
                 { item: 'Profit', cost: profit },
             ];
-        } catch (error) {
-            console.error('Error parsing auction data:', error);
-            this.snackBar.open('Invalid auction data format.', 'Dismiss', {
-                duration: 3000,
-            });
+
+            this.snackBar.open(
+                profit >= 0
+                    ? `Profit calculated: ${profit}`
+                    : `Loss calculated: ${profit}`,
+                'Dismiss',
+                { duration: 3000 },
+            );
+        } catch (error: any) {
+            console.error('Error calculating profit:', error);
+            this.snackBar.open(
+                error.message || 'Invalid auction data format.',
+                'Dismiss',
+                { duration: 3000 },
+            );
         }
     }
 }
