@@ -1,16 +1,11 @@
-// profitability-display.component.ts
+import { Component } from '@angular/core';
+
 @Component({
-    selector: 'app-profitability-display',
-    template: `
-        <mat-table [dataSource]="profitData">
-            <ng-container matColumnDef="item">
-                <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{ row.item }}</mat-cell>
-            </ng-container>
-            <!-- Add more columns for cost, revenue, profit -->
-        </mat-table>
-    `,
+  selector: 'app-profitability-display',
+  imports: [],
+  templateUrl: './profitability-display.component.html',
+  styleUrl: './profitability-display.component.scss'
 })
 export class ProfitabilityDisplayComponent {
-    @Input() profitData: any[] = [];
+
 }
