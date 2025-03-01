@@ -30,21 +30,15 @@ import { CommonModule } from '@angular/common';
                 padding: 24px;
             }
             h1 {
-                color: var(--text-primary);
                 font-size: 24px;
                 margin-bottom: 16px;
             }
             mat-list {
-                background-color: #252526;
                 border-radius: 4px;
                 padding: 8px;
             }
             a.mat-list-item {
-                color: var(--text-primary);
                 margin-bottom: 8px;
-                &:hover {
-                    background-color: #2f2f2f;
-                }
             }
         `,
     ],

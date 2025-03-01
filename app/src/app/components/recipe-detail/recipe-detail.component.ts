@@ -117,15 +117,12 @@ interface AuctionData {
                 padding: 24px;
             }
             mat-card {
-                background-color: #252526;
-                color: var(--text-primary);
                 margin-bottom: 16px;
             }
             mat-card-header {
-                border-bottom: 1px solid #3f3f3f;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             }
             mat-card-title {
-                color: var(--text-primary);
                 font-size: 20px;
             }
             .form-group {
@@ -133,32 +130,17 @@ interface AuctionData {
             }
             mat-form-field {
                 width: 100%;
-                background-color: #333333;
                 border-radius: 4px;
             }
             textarea {
                 min-height: 100px;
-                color: var(--text-primary);
-                background-color: transparent;
-            }
-            .mat-form-field-label {
-                color: var(--text-secondary) !important;
             }
             .results {
                 margin-top: 24px;
             }
             h3 {
-                color: var(--text-primary);
                 font-size: 18px;
                 margin-bottom: 16px;
-            }
-            mat-table {
-                background-color: #252526;
-            }
-            mat-header-cell,
-            mat-cell {
-                color: var(--text-primary);
-                border-bottom-color: #3f3f3f;
             }
         `,
     ],
