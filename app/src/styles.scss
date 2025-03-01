@@ -1,10 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
+:root {
+    --background: #1e1e1e;
+    --text-primary: #d4d4d4;
+    --text-secondary: #858585;
+    --accent: #007acc;
+}
 body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: "Roboto", "Helvetica Neue", sans-serif;
     margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    padding: 0;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// Ensure Material components adapt to the dark theme
+.mat-app-background {
+    background-color: var(--background) !important;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.mat-button,
+.mat-raised-button {
+    background-color: #2f2f2f;
+    color: var(--text-primary);
+    &:hover {
+        background-color: #3f3f3f;
+    }
+}
+
+.mat-list-item {
+    transition: background-color 0.2s ease;
+}
+
+mat-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3f3f3f;
+}

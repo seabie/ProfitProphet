@@ -1,0 +1,18 @@
+header {
+    background-color: #252526;
+    padding: 16px;
+    border-bottom: 1px solid #3f3f3f;
+    text-align: center;
+}
+
+h1 {
+    color: var(--text-primary);
+    font-size: 24px;
+    margin: 0;
+}
+
+main {
+    display: block;
+    min-height: calc(100vh - 72px);
+    background-color: var(--background);
+}

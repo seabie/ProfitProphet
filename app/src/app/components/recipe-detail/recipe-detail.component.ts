@@ -1,15 +1,15 @@
 // src/app/components/recipe-detail/recipe-detail.component.ts
 import { Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { ActivatedRoute } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 interface Recipe {
     id: string;
@@ -33,71 +33,135 @@ interface AuctionData {
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        MatSnackBarModule,
-        NgIf,
         FormsModule,
         ClipboardModule,
         MatTableModule,
+        MatSnackBarModule,
     ],
     template: `
-        <mat-card>
-            <mat-card-header>{{ recipe.name || 'Recipe' }}</mat-card-header>
-            <mat-card-content>
-                <mat-form-field>
-                    <mat-label>Search JSON</mat-label>
-                    <textarea
-                        matInput
-                        [(ngModel)]="recipe.inputJson"
-                        readonly
-                    ></textarea>
-                </mat-form-field>
-                <button mat-button [cdkCopyToClipboard]="recipe.inputJson">
-                    Copy
-                </button>
+        <div class="container">
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>{{
+                        recipe?.name || 'Recipe'
+                    }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="form-group">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Search JSON</mat-label>
+                            <textarea
+                                matInput
+                                [(ngModel)]="recipe.inputJson"
+                                readonly
+                            ></textarea>
+                        </mat-form-field>
+                        <button
+                            mat-button
+                            [cdkCopyToClipboard]="recipe.inputJson"
+                        >
+                            Copy
+                        </button>
+                    </div>
 
-                <mat-form-field>
-                    <mat-label>Auction Data</mat-label>
-                    <textarea
-                        matInput
-                        [(ngModel)]="auctionJson"
-                        placeholder="Paste JSON here"
-                    ></textarea>
-                </mat-form-field>
-                <button mat-button (click)="calculateProfit()">
-                    Calculate
-                </button>
+                    <div class="form-group">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Auction Data</mat-label>
+                            <textarea
+                                matInput
+                                [(ngModel)]="auctionJson"
+                                placeholder="Paste JSON here"
+                            ></textarea>
+                        </mat-form-field>
+                        <button mat-button (click)="calculateProfit()">
+                            Calculate
+                        </button>
+                    </div>
 
-                <div *ngIf="profitData.length">
-                    <h3>Profitability</h3>
-                    <mat-table [dataSource]="profitData">
-                        <ng-container matColumnDef="item">
-                            <mat-header-cell *matHeaderCellDef
-                                >Item</mat-header-cell
-                            >
-                            <mat-cell *matCellDef="let row">{{
-                                row.item
-                            }}</mat-cell>
-                        </ng-container>
-                        <ng-container matColumnDef="cost">
-                            <mat-header-cell *matHeaderCellDef
-                                >Cost</mat-header-cell
-                            >
-                            <mat-cell *matCellDef="let row">{{
-                                row.cost
-                            }}</mat-cell>
-                        </ng-container>
-                        <mat-header-row
-                            *matHeaderRowDef="['item', 'cost']"
-                        ></mat-header-row>
-                        <mat-row
-                            *matRowDef="let row; columns: ['item', 'cost']"
-                        ></mat-row>
-                    </mat-table>
-                </div>
-            </mat-card-content>
-        </mat-card>
+                    <div class="results" *ngIf="profitData.length">
+                        <h3>Profitability</h3>
+                        <mat-table [dataSource]="profitData">
+                            <ng-container matColumnDef="item">
+                                <mat-header-cell *matHeaderCellDef
+                                    >Item</mat-header-cell
+                                >
+                                <mat-cell *matCellDef="let row">{{
+                                    row.item
+                                }}</mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="cost">
+                                <mat-header-cell *matHeaderCellDef
+                                    >Cost</mat-header-cell
+                                >
+                                <mat-cell *matCellDef="let row">{{
+                                    row.cost
+                                }}</mat-cell>
+                            </ng-container>
+                            <mat-header-row
+                                *matHeaderRowDef="['item', 'cost']"
+                            ></mat-header-row>
+                            <mat-row
+                                *matRowDef="let row; columns: ['item', 'cost']"
+                            ></mat-row>
+                        </mat-table>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
     `,
-    styles: [],
+    styles: [
+        `
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 24px;
+            }
+            mat-card {
+                background-color: #252526;
+                color: var(--text-primary);
+                margin-bottom: 16px;
+            }
+            mat-card-header {
+                border-bottom: 1px solid #3f3f3f;
+            }
+            mat-card-title {
+                color: var(--text-primary);
+                font-size: 20px;
+            }
+            .form-group {
+                margin-bottom: 24px;
+            }
+            mat-form-field {
+                width: 100%;
+                background-color: #333333;
+                border-radius: 4px;
+            }
+            textarea {
+                min-height: 100px;
+                color: var(--text-primary);
+                background-color: transparent;
+            }
+            .mat-form-field-label {
+                color: var(--text-secondary) !important;
+            }
+            .results {
+                margin-top: 24px;
+            }
+            h3 {
+                color: var(--text-primary);
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+            mat-table {
+                background-color: #252526;
+            }
+            mat-header-cell,
+            mat-cell {
+                color: var(--text-primary);
+                border-bottom-color: #3f3f3f;
+            }
+        `,
+    ],
 })
 export class RecipeDetailComponent implements OnInit {
     recipe: Recipe = {
@@ -154,10 +218,11 @@ export class RecipeDetailComponent implements OnInit {
 
     calculateProfit() {
         if (!this.auctionJson) {
-            this.snackBar.open('No auction data provided', 'Dismiss', {
-                duration: 3000,
-            });
-            console.log('No auction data provided');
+            this.snackBar.open(
+                'Please paste auction data before calculating.',
+                'Dismiss',
+                { duration: 3000 },
+            );
             return;
         }
 
@@ -188,6 +253,9 @@ export class RecipeDetailComponent implements OnInit {
             ];
         } catch (error) {
             console.error('Error parsing auction data:', error);
+            this.snackBar.open('Invalid auction data format.', 'Dismiss', {
+                duration: 3000,
+            });
         }
     }
 }
