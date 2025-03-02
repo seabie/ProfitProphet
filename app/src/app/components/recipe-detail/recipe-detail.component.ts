@@ -10,7 +10,12 @@ import { ActivatedRoute } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+    ProfitabilityService,
+    ProfitResult,
+} from '../../services/profitability.service';
 
+// Define interfaces locally if they are specific to this component
 interface Recipe {
     id: string;
     name: string;
@@ -18,12 +23,6 @@ interface Recipe {
     inputJson: string;
     materials: { itemId: string; quantity: number; name?: string }[];
     outputItem: { itemId: string; quantity: number; name?: string };
-}
-
-interface AuctionData {
-    itemId: string;
-    price: number;
-    name?: string;
 }
 
 @Component({
@@ -161,6 +160,7 @@ export class RecipeDetailComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private snackBar: MatSnackBar,
+        private profitabilityService: ProfitabilityService,
     ) {}
 
     ngOnInit() {
@@ -292,66 +292,24 @@ export class RecipeDetailComponent implements OnInit {
         }
 
         try {
-            const auctionData: AuctionData[] = JSON.parse(this.auctionJson);
-            if (!Array.isArray(auctionData) || auctionData.length === 0) {
-                throw new Error('Auction data must be a non-empty array.');
-            }
-
-            const invalidEntry = auctionData.find(
-                (entry) =>
-                    !entry.itemId ||
-                    typeof entry.price !== 'number' ||
-                    entry.price < 0,
-            );
-            if (invalidEntry) {
-                throw new Error(
-                    'Auction data contains invalid entries. Each entry must have an itemId and a non-negative price.',
+            const auctionData = JSON.parse(this.auctionJson);
+            const result: ProfitResult =
+                this.profitabilityService.calculateProfit(
+                    this.recipe,
+                    auctionData,
                 );
-            }
-
-            let totalCost = 0;
-            const materialCosts = this.recipe.materials.map((material) => {
-                const priceData = auctionData.find(
-                    (data) => data.itemId === material.itemId,
-                );
-                if (!priceData) {
-                    throw new Error(
-                        `Price data not found for item ${material.name || material.itemId}.`,
-                    );
-                }
-                const cost = priceData.price * material.quantity;
-                totalCost += cost;
-                return {
-                    item: `${material.name || material.itemId} (x${material.quantity})`,
-                    cost,
-                };
-            });
-
-            const revenueData = auctionData.find(
-                (data) => data.itemId === this.recipe.outputItem.itemId,
-            );
-            if (!revenueData) {
-                throw new Error(
-                    `Price data not found for output item ${this.recipe.outputItem.name || this.recipe.outputItem.itemId}.`,
-                );
-            }
-            const revenue = revenueData.price * this.recipe.outputItem.quantity;
-            const profit = revenue - totalCost;
 
             this.profitData = [
-                ...materialCosts,
-                { item: 'Total Cost', cost: totalCost },
-                {
-                    item: `Revenue (${this.recipe.outputItem.name || this.recipe.outputItem.itemId} x${this.recipe.outputItem.quantity})`,
-                    cost: revenue,
-                },
-                { item: 'Profit', cost: profit },
+                ...result.materialCosts,
+                { item: 'Total Cost', cost: result.totalCost },
+                result.revenue,
+                { item: 'Profit', cost: result.profit },
             ];
 
             this.snackBar.open(
-                profit >= 0
-                    ? `Profit calculated: ${profit}`
-                    : `Loss calculated: ${profit}`,
+                result.profit >= 0
+                    ? `Profit calculated: ${result.profit}`
+                    : `Loss calculated: ${result.profit}`,
                 'Dismiss',
                 { duration: 3000 },
             );
