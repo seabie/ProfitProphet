@@ -1,5 +1,6 @@
 // src/app/components/recipe-detail/recipe-detail.component.ts
 import { Component, OnInit } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,20 +11,9 @@ import { ActivatedRoute } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-    ProfitabilityService,
-    ProfitResult,
-} from '../../services/profitability.service';
-
-// Define interfaces locally if they are specific to this component
-interface Recipe {
-    id: string;
-    name: string;
-    professionId: string;
-    inputJson: string;
-    materials: { itemId: string; quantity: number; name?: string }[];
-    outputItem: { itemId: string; quantity: number; name?: string };
-}
+import { ProfitabilityService } from '@services/profitability.service';
+import { Recipe } from '@models/recipe.interface';
+import { ProfitResult } from '@models/profit-result.interface';
 
 @Component({
     selector: 'app-recipe-detail',
@@ -33,6 +23,7 @@ interface Recipe {
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
+        NgIf,
         FormsModule,
         ClipboardModule,
         MatTableModule,
@@ -43,7 +34,7 @@ interface Recipe {
             <mat-card>
                 <mat-card-header>
                     <mat-card-title>{{
-                        recipe?.name || 'Recipe'
+                        recipe.name || 'Recipe'
                     }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>

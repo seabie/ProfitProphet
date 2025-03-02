@@ -3,20 +3,7 @@ import { Component } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-interface Recipe {
-    id: string;
-    name: string;
-    inputJson: string;
-    materials: { itemId: string; quantity: number; name?: string }[];
-    outputItem: { itemId: string; quantity: number; name?: string };
-}
-
-interface Profession {
-    id: string;
-    name: string;
-    recipes: Recipe[];
-}
+import { Profession } from '@models/profession.interface';
 
 @Component({
     selector: 'app-profession-list',
@@ -79,6 +66,7 @@ export class ProfessionListComponent {
                     id: '1',
                     name: 'Enchant Weapon - Power',
                     inputJson: '{"itemId": "123", "quantity": 1}',
+                    professionId: 'enchanting', // remove me
                     materials: [
                         { itemId: '123', quantity: 1, name: 'Arcane Dust' },
                         {
@@ -97,6 +85,7 @@ export class ProfessionListComponent {
                     id: '2',
                     name: 'Enchant Bracer - Stamina',
                     inputJson: '{"itemId": "126", "quantity": 1}',
+                    professionId: 'enchanting', // remove me
                     materials: [
                         { itemId: '123', quantity: 3, name: 'Arcane Dust' },
                     ],
@@ -116,6 +105,7 @@ export class ProfessionListComponent {
                     id: '1',
                     name: 'Frostweave Bag',
                     inputJson: '{"itemId": "456", "quantity": 2}',
+                    professionId: 'tailoring', // remove me
                     materials: [
                         {
                             itemId: '456',
@@ -134,6 +124,7 @@ export class ProfessionListComponent {
                     id: '2',
                     name: 'Netherweave Bag',
                     inputJson: '{"itemId": "459", "quantity": 2}',
+                    professionId: 'tailoring', // remove me
                     materials: [
                         {
                             itemId: '460',

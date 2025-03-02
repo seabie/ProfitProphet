@@ -1,27 +1,8 @@
 // src/app/services/profitability.service.ts
 import { Injectable } from '@angular/core';
-
-export interface Recipe {
-    id: string;
-    name: string;
-    professionId: string;
-    inputJson: string;
-    materials: { itemId: string; quantity: number; name?: string }[];
-    outputItem: { itemId: string; quantity: number; name?: string };
-}
-
-export interface AuctionData {
-    itemId: string;
-    price: number;
-    name?: string;
-}
-
-export interface ProfitResult {
-    materialCosts: { item: string; cost: number }[];
-    totalCost: number;
-    revenue: { item: string; cost: number };
-    profit: number;
-}
+import { Recipe } from '@models/recipe.interface';
+import { AuctionData } from '@models/auction-data.interface';
+import { ProfitResult } from '@models/profit-result.interface';
 
 @Injectable({
     providedIn: 'root', // Makes the service available globally
