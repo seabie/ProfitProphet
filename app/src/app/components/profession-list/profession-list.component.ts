@@ -3,7 +3,9 @@ import { Component } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Profession } from '@models/profession.interface';
+import { ProfessionService } from '../../services/profession.service';
+import { Observable } from 'rxjs';
+import { Profession } from '../../models/profession.interface';
 
 @Component({
     selector: 'app-profession-list',
@@ -12,8 +14,10 @@ import { Profession } from '@models/profession.interface';
     template: `
         <div class="container">
             <h1>Professions</h1>
-            <mat-list>
-                <ng-container *ngFor="let profession of professions">
+            <div *ngIf="loading$ | async" class="loading">Loading...</div>
+            <div *ngIf="error$ | async as error" class="error">{{ error }}</div>
+            <mat-list *ngIf="!(loading$ | async) && !(error$ | async)">
+                <ng-container *ngFor="let profession of professions$ | async">
                     <h3 mat-subheader>{{ profession.name }}</h3>
                     <a
                         mat-list-item
@@ -53,93 +57,23 @@ import { Profession } from '@models/profession.interface';
                 margin-top: 16px;
                 font-size: 18px;
             }
+            .loading,
+            .error {
+                margin: 16px 0;
+                font-style: italic;
+                color: #999;
+            }
         `,
     ],
 })
 export class ProfessionListComponent {
-    professions: Profession[] = [
-        {
-            id: 'enchanting',
-            name: 'Enchanting',
-            recipes: [
-                {
-                    id: '1',
-                    name: 'Enchant Weapon - Power',
-                    inputJson: '{"itemId": "123", "quantity": 1}',
-                    professionId: 'enchanting', // remove me
-                    materials: [
-                        { itemId: '123', quantity: 1, name: 'Arcane Dust' },
-                        {
-                            itemId: '124',
-                            quantity: 2,
-                            name: 'Greater Planar Essence',
-                        },
-                    ],
-                    outputItem: {
-                        itemId: '125',
-                        quantity: 1,
-                        name: 'Enchant Weapon - Power',
-                    },
-                },
-                {
-                    id: '2',
-                    name: 'Enchant Bracer - Stamina',
-                    inputJson: '{"itemId": "126", "quantity": 1}',
-                    professionId: 'enchanting', // remove me
-                    materials: [
-                        { itemId: '123', quantity: 3, name: 'Arcane Dust' },
-                    ],
-                    outputItem: {
-                        itemId: '126',
-                        quantity: 1,
-                        name: 'Enchant Bracer - Stamina',
-                    },
-                },
-            ],
-        },
-        {
-            id: 'tailoring',
-            name: 'Tailoring',
-            recipes: [
-                {
-                    id: '1',
-                    name: 'Frostweave Bag',
-                    inputJson: '{"itemId": "456", "quantity": 2}',
-                    professionId: 'tailoring', // remove me
-                    materials: [
-                        {
-                            itemId: '456',
-                            quantity: 4,
-                            name: 'Frostweave Cloth',
-                        },
-                        { itemId: '457', quantity: 1, name: 'Eternium Thread' },
-                    ],
-                    outputItem: {
-                        itemId: '458',
-                        quantity: 1,
-                        name: 'Frostweave Bag',
-                    },
-                },
-                {
-                    id: '2',
-                    name: 'Netherweave Bag',
-                    inputJson: '{"itemId": "459", "quantity": 2}',
-                    professionId: 'tailoring', // remove me
-                    materials: [
-                        {
-                            itemId: '460',
-                            quantity: 4,
-                            name: 'Netherweave Cloth',
-                        },
-                        { itemId: '457', quantity: 1, name: 'Eternium Thread' },
-                    ],
-                    outputItem: {
-                        itemId: '459',
-                        quantity: 1,
-                        name: 'Netherweave Bag',
-                    },
-                },
-            ],
-        },
-    ];
+    professions$: Observable<Profession[]>;
+    loading$: Observable<boolean>;
+    error$: Observable<string | null>;
+
+    constructor(private professionService: ProfessionService) {
+        this.professions$ = this.professionService.getProfessions();
+        this.loading$ = this.professionService.loading$;
+        this.error$ = this.professionService.error$;
+    }
 }

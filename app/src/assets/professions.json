@@ -1,0 +1,93 @@
+[
+    {
+        "id": "enchanting",
+        "name": "Enchanting",
+        "recipes": [
+            {
+                "id": "1",
+                "name": "Enchant Weapon - Power",
+                "inputJson": "{\"itemId\": \"123\", \"quantity\": 1}",
+                "materials": [
+                    { "itemId": "123", "quantity": 1, "name": "Arcane Dust" },
+                    {
+                        "itemId": "124",
+                        "quantity": 2,
+                        "name": "Greater Planar Essence"
+                    }
+                ],
+                "outputItem": {
+                    "itemId": "125",
+                    "quantity": 1,
+                    "name": "Enchant Weapon - Power"
+                },
+                "professionId": "enchanting"
+            },
+            {
+                "id": "2",
+                "name": "Enchant Bracer - Stamina",
+                "inputJson": "{\"itemId\": \"126\", \"quantity\": 1}",
+                "materials": [
+                    { "itemId": "123", "quantity": 3, "name": "Arcane Dust" }
+                ],
+                "outputItem": {
+                    "itemId": "126",
+                    "quantity": 1,
+                    "name": "Enchant Bracer - Stamina"
+                },
+                "professionId": "enchanting"
+            }
+        ]
+    },
+    {
+        "id": "tailoring",
+        "name": "Tailoring",
+        "recipes": [
+            {
+                "id": "1",
+                "name": "Frostweave Bag",
+                "inputJson": "{\"itemId\": \"456\", \"quantity\": 2}",
+                "materials": [
+                    {
+                        "itemId": "456",
+                        "quantity": 4,
+                        "name": "Frostweave Cloth"
+                    },
+                    {
+                        "itemId": "457",
+                        "quantity": 1,
+                        "name": "Eternium Thread"
+                    }
+                ],
+                "outputItem": {
+                    "itemId": "458",
+                    "quantity": 1,
+                    "name": "Frostweave Bag"
+                },
+                "professionId": "tailoring"
+            },
+            {
+                "id": "2",
+                "name": "Netherweave Bag",
+                "inputJson": "{\"itemId\": \"459\", \"quantity\": 2}",
+                "materials": [
+                    {
+                        "itemId": "460",
+                        "quantity": 4,
+                        "name": "Netherweave Cloth"
+                    },
+                    {
+                        "itemId": "457",
+                        "quantity": 1,
+                        "name": "Eternium Thread"
+                    }
+                ],
+                "outputItem": {
+                    "itemId": "459",
+                    "quantity": 1,
+                    "name": "Netherweave Bag"
+                },
+                "professionId": "tailoring"
+            }
+        ]
+    }
+]

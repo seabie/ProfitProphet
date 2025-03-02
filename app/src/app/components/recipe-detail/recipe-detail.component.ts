@@ -1,5 +1,5 @@
 // src/app/components/recipe-detail/recipe-detail.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,8 +12,10 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProfitabilityService } from '@services/profitability.service';
-import { Recipe } from '@models/recipe.interface';
+import { ProfessionService } from '@services/profession.service';
 import { ProfitResult } from '@models/profit-result.interface';
+import { Recipe } from '@models/recipe.interface';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-recipe-detail',
@@ -31,11 +33,9 @@ import { ProfitResult } from '@models/profit-result.interface';
     ],
     template: `
         <div class="container">
-            <mat-card>
+            <mat-card *ngIf="recipe; else notFound">
                 <mat-card-header>
-                    <mat-card-title>{{
-                        recipe.name || 'Recipe'
-                    }}</mat-card-title>
+                    <mat-card-title>{{ recipe.name }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
                     <div class="form-group">
@@ -98,6 +98,9 @@ import { ProfitResult } from '@models/profit-result.interface';
                     </div>
                 </mat-card-content>
             </mat-card>
+            <ng-template #notFound>
+                <div class="error">Recipe not found.</div>
+            </ng-template>
         </div>
     `,
     styles: [
@@ -133,143 +136,56 @@ import { ProfitResult } from '@models/profit-result.interface';
                 font-size: 18px;
                 margin-bottom: 16px;
             }
+            .error {
+                margin: 16px 0;
+                font-style: italic;
+                color: #999;
+            }
         `,
     ],
 })
-export class RecipeDetailComponent implements OnInit {
-    recipe: Recipe = {
-        id: '',
-        name: '',
-        professionId: '',
-        inputJson: '',
-        materials: [],
-        outputItem: { itemId: '', quantity: 0 },
-    };
+export class RecipeDetailComponent implements OnInit, OnDestroy {
+    recipe: Recipe;
     auctionJson = '';
     profitData: { item: string; cost: number }[] = [];
+    private subscription: Subscription = new Subscription();
 
     constructor(
         private route: ActivatedRoute,
         private snackBar: MatSnackBar,
         private profitabilityService: ProfitabilityService,
-    ) {}
+        private professionService: ProfessionService,
+    ) {
+        this.recipe = {} as Recipe;
+    }
 
     ngOnInit() {
         const professionId = this.route.snapshot.paramMap.get('id');
         const recipeId = this.route.snapshot.paramMap.get('recipeId');
 
-        // In a real app, fetch recipes from a service; for now, use a static list
-        const professions = [
-            {
-                id: 'enchanting',
-                name: 'Enchanting',
-                recipes: [
-                    {
-                        id: '1',
-                        name: 'Enchant Weapon - Power',
-                        professionId: 'enchanting',
-                        inputJson: '{"itemId": "123", "quantity": 1}',
-                        materials: [
-                            { itemId: '123', quantity: 1, name: 'Arcane Dust' },
-                            {
-                                itemId: '124',
-                                quantity: 2,
-                                name: 'Greater Planar Essence',
-                            },
-                        ],
-                        outputItem: {
-                            itemId: '125',
-                            quantity: 1,
-                            name: 'Enchant Weapon - Power',
-                        },
-                    },
-                    {
-                        id: '2',
-                        name: 'Enchant Bracer - Stamina',
-                        professionId: 'enchanting',
-                        inputJson: '{"itemId": "126", "quantity": 1}',
-                        materials: [
-                            { itemId: '123', quantity: 3, name: 'Arcane Dust' },
-                        ],
-                        outputItem: {
-                            itemId: '126',
-                            quantity: 1,
-                            name: 'Enchant Bracer - Stamina',
-                        },
-                    },
-                ],
-            },
-            {
-                id: 'tailoring',
-                name: 'Tailoring',
-                recipes: [
-                    {
-                        id: '1',
-                        name: 'Frostweave Bag',
-                        professionId: 'tailoring',
-                        inputJson: '{"itemId": "456", "quantity": 2}',
-                        materials: [
-                            {
-                                itemId: '456',
-                                quantity: 4,
-                                name: 'Frostweave Cloth',
-                            },
-                            {
-                                itemId: '457',
-                                quantity: 1,
-                                name: 'Eternium Thread',
-                            },
-                        ],
-                        outputItem: {
-                            itemId: '458',
-                            quantity: 1,
-                            name: 'Frostweave Bag',
-                        },
-                    },
-                    {
-                        id: '2',
-                        name: 'Netherweave Bag',
-                        professionId: 'tailoring',
-                        inputJson: '{"itemId": "459", "quantity": 2}',
-                        materials: [
-                            {
-                                itemId: '460',
-                                quantity: 4,
-                                name: 'Netherweave Cloth',
-                            },
-                            {
-                                itemId: '457',
-                                quantity: 1,
-                                name: 'Eternium Thread',
-                            },
-                        ],
-                        outputItem: {
-                            itemId: '459',
-                            quantity: 1,
-                            name: 'Netherweave Bag',
-                        },
-                    },
-                ],
-            },
-        ];
-
-        const profession = professions.find((p) => p.id === professionId);
-        if (profession) {
-            const foundRecipe = profession.recipes.find(
-                (r) => r.id === recipeId,
+        if (professionId && recipeId) {
+            this.subscription.add(
+                this.professionService
+                    .getRecipe(professionId, recipeId)
+                    .subscribe((recipe) => {
+                        if (recipe) {
+                            this.recipe = recipe;
+                        } else {
+                            this.snackBar.open('Recipe not found.', 'Dismiss', {
+                                duration: 3000,
+                            });
+                        }
+                    }),
             );
-            if (foundRecipe) {
-                this.recipe = foundRecipe;
-            } else {
-                this.snackBar.open('Recipe not found.', 'Dismiss', {
-                    duration: 3000,
-                });
-            }
         } else {
-            this.snackBar.open('Profession not found.', 'Dismiss', {
+            this.snackBar.open('Invalid profession or recipe ID.', 'Dismiss', {
                 duration: 3000,
             });
         }
+    }
+
+    ngOnDestroy() {
+        this.subscription.unsubscribe();
     }
 
     calculateProfit() {
@@ -279,6 +195,13 @@ export class RecipeDetailComponent implements OnInit {
                 'Dismiss',
                 { duration: 3000 },
             );
+            return;
+        }
+
+        if (!this.recipe) {
+            this.snackBar.open('No recipe selected.', 'Dismiss', {
+                duration: 3000,
+            });
             return;
         }
 
